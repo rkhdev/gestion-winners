@@ -1,0 +1,17 @@
+{
+  "name": "DESTIN FA — Gestion Caisse",
+  "short_name": "DESTIN FA",
+  "description": "Application de gestion de la caisse du club de football",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0d3b1e",
+  "theme_color": "#0d3b1e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%230d3b1e' rx='32'/><text y='130' x='96' text-anchor='middle' font-size='110'>⚽</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

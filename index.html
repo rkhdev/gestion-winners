@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#0d3b1e"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>⚽ Gestion Winners</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --green-dark:  #0d3b1e;
+  --green-mid:   #1a6b38;
+  --green:       #27ae60;
+  --green-light: #a8e6c1;
+  --green-pale:  #e8f8ef;
+  --gold:        #f0a500;
+  --gold-light:  #fff4d6;
+  --red:         #e74c3c;
+  --red-light:   #fdecea;
+  --white:       #ffffff;
+  --off-white:   #f7faf8;
+  --gray-100:    #f0f4f2;
+  --gray-200:    #dde8e2;
+  --gray-400:    #8fa99a;
+  --gray-600:    #4a6358;
+  --gray-800:    #1e2d26;
+  --font-title:  'Bebas Neue', sans-serif;
+  --font-body:   'DM Sans', sans-serif;
+  --radius:      14px;
+  --radius-sm:   8px;
+  --shadow:      0 4px 24px rgba(13,59,30,0.10);
+  --shadow-lg:   0 8px 40px rgba(13,59,30,0.18);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--off-white);
+  color: var(--gray-800);
+  min-height: 100vh;
+  overscroll-behavior: none;
+}
+
+/* ── TOPBAR ── */
+#topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: var(--green-dark);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px;
+  height: 56px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+#topbar-title {
+  font-family: var(--font-title);
+  font-size: 22px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+#topbar-user {
+  display: flex; align-items: center; gap: 8px;
+}
+#user-badge {
+  background: var(--green-mid);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+#btn-logout {
+  background: none; border: none; cursor: pointer;
+  color: var(--gray-400); font-size: 18px; padding: 4px;
+  transition: color 0.2s;
+}
+#btn-logout:hover { color: var(--red); }
+
+/* ── BOTTOM NAV ── */
+#bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  background: var(--green-dark);
+  display: flex;
+  height: 62px;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.2);
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px;
+  background: none; border: none; cursor: pointer;
+  color: var(--gray-400);
+  font-family: var(--font-body);
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-btn .nav-icon { font-size: 20px; line-height: 1; }
+.nav-btn.active { color: var(--gold); }
+.nav-btn.active .nav-icon { transform: scale(1.15); }
+
+/* ── MAIN CONTENT ── */
+#main {
+  padding: 72px 16px 78px;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; }
+.screen.active { display: block; animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+/* ── LOGIN ── */
+#screen-login {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 100vh;
+  padding: 32px 24px;
+  background: linear-gradient(160deg, var(--green-dark) 0%, #0a2d16 100%);
+}
+.login-logo {
+  font-family: var(--font-title);
+  font-size: 52px;
+  color: var(--gold);
+  letter-spacing: 3px;
+  margin-bottom: 4px;
+}
+.login-sub {
+  color: var(--green-light);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+.login-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  width: 100%; max-width: 360px;
+  backdrop-filter: blur(10px);
+}
+.login-card h2 {
+  color: var(--white);
+  font-family: var(--font-title);
+  font-size: 24px;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  color: var(--green-light);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-sm);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color: var(--gold);
+}
+.form-group input::placeholder { color: rgba(255,255,255,0.3); }
+.form-group select option { background: var(--green-dark); color: var(--white); }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 14px; font-weight: 600;
+  border: none; cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-primary {
+  background: var(--gold);
+  color: var(--green-dark);
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+}
+.btn-primary:hover { background: #e09500; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-green {
+  background: var(--green);
+  color: var(--white);
+}
+.btn-green:hover { background: var(--green-mid); }
+.btn-red {
+  background: var(--red);
+  color: var(--white);
+}
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--gray-200);
+  color: var(--gray-600);
+}
+.btn-sm { padding: 7px 14px; font-size: 12px; }
+.btn-full { width: 100%; }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  margin-bottom: 20px;
+}
+.page-header h1 {
+  font-family: var(--font-title);
+  font-size: 30px;
+  color: var(--green-dark);
+  letter-spacing: 1px;
+  line-height: 1.1;
+}
+.page-header p {
+  color: var(--gray-400);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 14px;
+}
+.card-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 6px;
+}
+
+/* ── DASHBOARD STATS ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.stat-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+.stat-card.green { background: var(--green-dark); }
+.stat-card.gold  { background: var(--gold); }
+.stat-card.red   { background: var(--red-light); border: 1.5px solid #f5c6c2; }
+.stat-card.full  { grid-column: 1 / -1; background: var(--green-dark); }
+
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: var(--gray-400);
+}
+.stat-card.green .stat-label,
+.stat-card.gold  .stat-label { color: rgba(255,255,255,0.6); }
+.stat-card.full  .stat-label { color: rgba(255,255,255,0.6); }
+
+.stat-value {
+  font-family: var(--font-title);
+  font-size: 26px;
+  letter-spacing: 0.5px;
+  color: var(--gray-800);
+  line-height: 1;
+}
+.stat-card.green .stat-value,
+.stat-card.full  .stat-value { color: var(--gold); font-size: 32px; }
+.stat-card.gold  .stat-value { color: var(--green-dark); }
+.stat-card.red   .stat-value { color: var(--red); }
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--gray-400);
+  margin-top: 4px;
+}
+.stat-card.green .stat-sub,
+.stat-card.gold  .stat-sub,
+.stat-card.full  .stat-sub { color: rgba(255,255,255,0.5); }
+
+/* ── LIST ITEMS ── */
+.list-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+.list-item:last-child { border-bottom: none; }
+.list-item-left { display: flex; align-items: center; gap: 12px; }
+.list-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--green-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-title);
+  font-size: 16px;
+  color: var(--green-mid);
+  flex-shrink: 0;
+}
+.list-name { font-weight: 600; font-size: 14px; color: var(--gray-800); }
+.list-meta { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
+.list-amount { font-family: var(--font-title); font-size: 18px; letter-spacing: 0.5px; }
+.amount-green { color: var(--green); }
+.amount-red   { color: var(--red); }
+.amount-gold  { color: var(--gold); }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-block;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 20px;
+}
+.badge-green  { background: var(--green-pale); color: var(--green-mid); }
+.badge-gold   { background: var(--gold-light);  color: #8a5e00; }
+.badge-red    { background: var(--red-light);   color: var(--red); }
+.badge-gray   { background: var(--gray-100);    color: var(--gray-600); }
+.badge-admin  { background: var(--gold);        color: var(--green-dark); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.open {
+  opacity: 1; pointer-events: all;
+}
+.modal-box {
+  background: var(--white);
+  border-radius: 20px 20px 0 0;
+  width: 100%; max-width: 540px;
+  padding: 24px 20px 32px;
+  transform: translateY(40px);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-overlay.open .modal-box {
+  transform: translateY(0);
+}
+.modal-handle {
+  width: 40px; height: 4px;
+  background: var(--gray-200);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+.modal-title {
+  font-family: var(--font-title);
+  font-size: 24px;
+  color: var(--green-dark);
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+/* ── LIGHT FORM (in app) ── */
+.light-form .form-group label {
+  color: var(--gray-600);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+.light-form .form-group input,
+.light-form .form-group select,
+.light-form .form-group textarea {
+  background: var(--gray-100);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  color: var(--gray-800);
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 12px 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.light-form .form-group input:focus,
+.light-form .form-group select:focus {
+  border-color: var(--green);
+  background: var(--white);
+}
+.light-form .form-group { margin-bottom: 14px; }
+
+/* ── SECTION TABS ── */
+.seg-tabs {
+  display: flex; gap: 6px;
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 16px;
+}
+.seg-tab {
+  flex: 1;
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 12px; font-weight: 600;
+  color: var(--gray-400);
+  padding: 8px 4px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.seg-tab.active {
+  background: var(--white);
+  color: var(--green-dark);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--gray-400);
+}
+.empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 13px; }
+
+/* ── ALERT ── */
+.alert {
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.alert-error   { background: var(--red-light);   color: var(--red); }
+.alert-success { background: var(--green-pale);  color: var(--green-mid); }
+.alert-warn    { background: var(--gold-light);  color: #8a5e00; }
+
+/* ── DELETE BTN ── */
+.delete-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--gray-400); font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.delete-btn:hover { color: var(--red); background: var(--red-light); }
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  height: 8px; background: var(--gray-100);
+  border-radius: 4px; overflow: hidden;
+  margin-top: 8px;
+}
+.progress-fill {
+  height: 100%; background: var(--gold);
+  border-radius: 4px; transition: width 0.4s ease;
+}
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: var(--gray-800); color: var(--white);
+  font-size: 13px; font-weight: 500;
+  padding: 10px 20px; border-radius: 24px;
+  white-space: nowrap;
+  z-index: 300;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+  max-width: 90vw;
+  text-align: center;
+}
+#toast.show { opacity: 1; }
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px; background: var(--gray-100);
+  margin: 16px 0;
+}
+
+/* ── FAB ── */
+.fab {
+  position: fixed; bottom: 80px; right: 20px;
+  width: 52px; height: 52px;
+  background: var(--green);
+  color: var(--white);
+  border: none; cursor: pointer;
+  border-radius: 50%;
+  font-size: 24px;
+  box-shadow: 0 4px 16px rgba(39,174,96,0.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  z-index: 90;
+  -webkit-tap-highlight-color: transparent;
+}
+.fab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(39,174,96,0.5); }
+.fab:active { transform: scale(0.96); }
+
+/* ── SEARCH ── */
+.search-bar {
+  position: relative; margin-bottom: 16px;
+}
+.search-bar input {
+  width: 100%;
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: 24px;
+  padding: 10px 16px 10px 40px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-bar input:focus { border-color: var(--green); }
+.search-bar .search-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--gray-400); font-size: 16px;
+}
+
+/* ── SCROLLABLE ── */
+.scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ── RESPONSIVE TWEAK ── */
+@media (min-width: 540px) {
+  #main { padding: 72px 24px 78px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ LOGIN SCREEN ═══════════════════════════ -->
+<div id="screen-login">
+  <div class="login-logo">⚽ WINNERS</div>
+  <div class="login-sub">Gestion Winners</div>
+  <div class="login-card">
+    <h2>CONNEXION</h2>
+    <div id="login-alert" class="alert alert-error" style="display:none"></div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="votre@email.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()">SE CONNECTER</button>
+    <p style="color:rgba(255,255,255,0.3); font-size:11px; text-align:center; margin-top:16px;">
+      Compte de démo : admin@club.com / admin123<br>
+      Membre : membre@club.com / membre123
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ APP SHELL ═══════════════════════════ -->
+<div id="app-shell" style="display:none">
+
+  <!-- Topbar -->
+  <div id="topbar">
+    <div id="topbar-title">⚽ GESTION WINNERS</div>
+    <div id="topbar-user">
+      <span id="user-badge">ADMIN</span>
+      <button id="btn-logout" onclick="doLogout()" title="Déconnexion">⎋</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div id="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="screen-dash" class="screen active">
+      <div class="page-header">
+        <h1>TABLEAU DE BORD</h1>
+        <p id="dash-date"></p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">💰 Cotisations Hebdo</div>
+          <div class="stat-value" id="stat-hebdo">0</div>
+          <div class="stat-sub">FCFA collectés</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-label">🎯 Cotisations Spéc.</div>
+          <div class="stat-value" id="stat-spec">0</div>
+          <div class="stat-sub">FCFA collectés</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">📤 Dépenses</div>
+          <div class="stat-value" id="stat-dep">0</div>
+          <div class="stat-sub">FCFA dépensés</div>
+        </div>
+        <div class="stat-card" id="stat-solde-card">
+          <div class="stat-label">🏦 Solde Caisse</div>
+          <div class="stat-value" id="stat-solde">0</div>
+          <div class="stat-sub">FCFA disponibles</div>
+        </div>
+      </div>
+
+      <div id="dash-alert" style="display:none"></div>
+
+      <div class="card">
+        <div class="card-title">Dernières opérations</div>
+        <div id="dash-recent"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Membres actifs</div>
+        <div style="display:flex; align-items:center; gap:12px; margin-top:4px;">
+          <div style="font-family:var(--font-title); font-size:36px; color:var(--green)" id="stat-membres">0</div>
+          <div style="font-size:13px; color:var(--gray-400)">membres enregistrés</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COTISATIONS ── -->
+    <div id="screen-cotis" class="screen">
+      <div class="page-header">
+        <h1>COTISATIONS</h1>
+        <p>Hebdomadaires &amp; spéciales</p>
+      </div>
+
+      <div class="seg-tabs">
+        <button class="seg-tab active" onclick="switchCotisTab('hebdo',this)">Hebdomadaires</button>
+        <button class="seg-tab" onclick="switchCotisTab('spec',this)">Spéciales</button>
+      </div>
+
+      <!-- Hebdo list -->
+      <div id="cotis-hebdo-view">
+        <div class="card" style="background:var(--green-pale); border:1.5px solid var(--green-light)">
+          <div class="card-title">Total hebdo</div>
+          <div style="font-family:var(--font-title); font-size:30px; color:var(--green-dark)" id="cotis-hebdo-total">0 FCFA</div>
+        </div>
+        <div class="card">
+          <div id="cotis-hebdo-list"></div>
+        </div>
+      </div>
+
+      <!-- Spec list -->
+      <div id="cotis-spec-view" style="display:none">
+        <div class="card" style="background:var(--gold-light); border:1.5px solid #f5d78a">
+          <div class="card-title">Total spéciales</div>
+          <div style="font-family:var(--font-title); font-size:30px; color:#8a5e00" id="cotis-spec-total">0 FCFA</div>
+          <div id="spec-progress-wrap" style="display:none">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#8a5e00;margin-top:8px;">
+              <span>Progression</span><span id="spec-prog-pct">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="spec-prog-bar" style="width:0%"></div></div>
+            <div style="font-size:11px;color:#8a5e00;margin-top:4px;">Objectif : <span id="spec-objectif-lbl">0</span> FCFA</div>
+          </div>
+        </div>
+        <div class="card">
+          <div id="cotis-spec-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DÉPENSES ── -->
+    <div id="screen-dep" class="screen">
+      <div class="page-header">
+        <h1>DÉPENSES</h1>
+        <p>Toutes les sorties de caisse</p>
+      </div>
+      <div class="card" style="background:var(--red-light); border:1.5px solid #f5c6c2">
+        <div class="card-title">Total dépenses</div>
+        <div style="font-family:var(--font-title); font-size:30px; color:var(--red)" id="dep-total">0 FCFA</div>
+      </div>
+      <div class="card">
+        <div id="dep-list"></div>
+      </div>
+    </div>
+
+    <!-- ── MEMBRES ── -->
+    <div id="screen-membres" class="screen">
+      <div class="page-header">
+        <h1>MEMBRES</h1>
+        <p>Gestion des joueurs du club</p>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Rechercher un membre…" id="membre-search" oninput="renderMembres()"/>
+      </div>
+      <div id="membres-list"></div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- Bottom nav -->
+  <nav id="bottom-nav">
+    <button class="nav-btn active" onclick="goScreen('dash',this)">
+      <span class="nav-icon">📊</span>Dashboard
+    </button>
+    <button class="nav-btn" onclick="goScreen('cotis',this)">
+      <span class="nav-icon">💰</span>Cotisations
+    </button>
+    <button class="nav-btn" onclick="goScreen('dep',this)">
+      <span class="nav-icon">📤</span>Dépenses
+    </button>
+    <button class="nav-btn" onclick="goScreen('membres',this)">
+      <span class="nav-icon">👥</span>Membres
+    </button>
+  </nav>
+
+  <!-- FAB -->
+  <button class="fab" id="fab-btn" onclick="openFab()">＋</button>
+
+</div><!-- /app-shell -->
+
+<!-- ═══════════════════ MODALS ═══════════════════ -->
+
+<!-- Modal: Ajouter cotisation hebdo -->
+<div class="modal-overlay" id="modal-hebdo">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nouvelle Cotisation Hebdo</div>
+    <div class="light-form">
+      <div class="form-group">
+        <label>Membre</label>
+        <select id="hebdo-membre"></select>
+      </div>
+      <div class="form-group">
+        <label>Date de séance</label>
+        <input type="date" id="hebdo-date"/>
+      </div>
+      <div class="form-group">
+        <label>Montant (FCFA)</label>
+        <input type="number" id="hebdo-montant" placeholder="500" min="0"/>
+      </div>
+      <div class="form-group">
+        <label>Collecté par</label>
+        <input type="text" id="hebdo-collecteur" placeholder="Nom du trésorier"/>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="btn btn-outline btn-full" onclick="closeModal('modal-hebdo')">Annuler</button>
+        <button class="btn btn-green btn-full" onclick="saveHebdo()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Ajouter cotisation spéciale -->
+<div class="modal-overlay" id="modal-spec">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nouvelle Cotisation Spéciale</div>
+    <div class="light-form">
+      <div class="form-group">
+        <label>Objet de la collecte</label>
+        <input type="text" id="spec-objet" placeholder="Ex: Achat de ballons, Dossards…"/>
+      </div>
+      <div class="form-group">
+        <label>Membre</label>
+        <select id="spec-membre"></select>
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="spec-date"/>
+      </div>
+      <div class="form-group">
+        <label>Montant donné (FCFA)</label>
+        <input type="number" id="spec-montant" placeholder="0" min="0"/>
+      </div>
+      <div class="form-group">
+        <label>Objectif total (FCFA) — optionnel</label>
+        <input type="number" id="spec-objectif" placeholder="0" min="0"/>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="btn btn-outline btn-full" onclick="closeModal('modal-spec')">Annuler</button>
+        <button class="btn btn-primary btn-full" onclick="saveSpec()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Ajouter dépense -->
+<div class="modal-overlay" id="modal-dep">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nouvelle Dépense</div>
+    <div class="light-form">
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="dep-desc" placeholder="Ex: Location terrain, Achat ballons…"/>
+      </div>
+      <div class="form-group">
+        <label>Catégorie</label>
+        <select id="dep-cat">
+          <option>Terrain / Location</option>
+          <option>Ballons</option>
+          <option>Dossards</option>
+          <option>Arbitrage</option>
+          <option>Transport</option>
+          <option>Restauration</option>
+          <option>Médical</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="dep-date"/>
+      </div>
+      <div class="form-group">
+        <label>Montant (FCFA)</label>
+        <input type="number" id="dep-montant" placeholder="0" min="0"/>
+      </div>
+      <div class="form-group">
+        <label>Payé par</label>
+        <input type="text" id="dep-payeur" placeholder="Nom du payeur"/>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="btn btn-outline btn-full" onclick="closeModal('modal-dep')">Annuler</button>
+        <button class="btn btn-red btn-full" onclick="saveDep()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Ajouter membre -->
+<div class="modal-overlay" id="modal-membre">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nouveau Membre</div>
+    <div class="light-form">
+      <div class="form-group">
+        <label>Nom</label>
+        <input type="text" id="mbr-nom" placeholder="Nom de famille"/>
+      </div>
+      <div class="form-group">
+        <label>Prénom</label>
+        <input type="text" id="mbr-prenom" placeholder="Prénom"/>
+      </div>
+      <div class="form-group">
+        <label>Poste</label>
+        <select id="mbr-poste">
+          <option>Gardien</option>
+          <option>Défenseur</option>
+          <option>Milieu</option>
+          <option>Attaquant</option>
+          <option>Capitaine</option>
+          <option>Trésorier</option>
+          <option>Président</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Rôle dans l'app</label>
+        <select id="mbr-role">
+          <option value="membre">Membre (lecture seule)</option>
+          <option value="admin">Administrateur (accès complet)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="btn btn-outline btn-full" onclick="closeModal('modal-membre')">Annuler</button>
+        <button class="btn btn-green btn-full" onclick="saveMembre()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: FAB menu -->
+<div class="modal-overlay" id="modal-fab">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Ajouter une entrée</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-green btn-full" style="justify-content:flex-start;gap:14px;padding:16px 18px;" onclick="closeModal('modal-fab');openModal('modal-hebdo')">
+        <span style="font-size:22px;">💰</span>
+        <div style="text-align:left">
+          <div style="font-size:14px;">Cotisation Hebdomadaire</div>
+          <div style="font-size:11px;font-weight:400;opacity:0.7;">Enregistrer le paiement d'un membre</div>
+        </div>
+      </button>
+      <button class="btn btn-full" style="background:var(--gold);color:var(--green-dark);justify-content:flex-start;gap:14px;padding:16px 18px;" onclick="closeModal('modal-fab');openModal('modal-spec')">
+        <span style="font-size:22px;">🎯</span>
+        <div style="text-align:left">
+          <div style="font-size:14px;">Cotisation Spéciale</div>
+          <div style="font-size:11px;font-weight:400;opacity:0.6;">Équipement, projet, collecte ponctuelle</div>
+        </div>
+      </button>
+      <button class="btn btn-red btn-full" style="justify-content:flex-start;gap:14px;padding:16px 18px;" onclick="closeModal('modal-fab');openModal('modal-dep')">
+        <span style="font-size:22px;">📤</span>
+        <div style="text-align:left">
+          <div style="font-size:14px;">Dépense</div>
+          <div style="font-size:11px;font-weight:400;opacity:0.7;">Sortie d'argent de la caisse</div>
+        </div>
+      </button>
+      <button class="btn btn-outline btn-full" style="justify-content:flex-start;gap:14px;padding:16px 18px;" onclick="closeModal('modal-fab');openModal('modal-membre')">
+        <span style="font-size:22px;">👤</span>
+        <div style="text-align:left">
+          <div style="font-size:14px;">Nouveau Membre</div>
+          <div style="font-size:11px;font-weight:400;opacity:0.7;">Ajouter un joueur au club</div>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA LAYER — Supabase (synchronisation cloud)
+// ═══════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://hlimwysgfwxhdomdvomn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhsaW13eXNnZnd4aGRvbWR2b21uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0OTg3OTgsImV4cCI6MjA4OTA3NDc5OH0.HCWA5Kgv3Ih4Xhus-50M2MpXRgNuv4SZhv-hbTsFDeo';
+
+async function sbFetch(table, method = 'GET', body = null, filter = '') {
+  const url = `${SUPABASE_URL}/rest/v1/${table}${filter}`;
+  const opts = {
+    method,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : 'return=minimal'
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res = await fetch(url, opts);
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('Supabase error:', res.status, errText);
+      throw new Error('HTTP ' + res.status + ': ' + errText);
+    }
+    if (method === 'GET') return res.json();
+    return true;
+  } catch(e) {
+    console.error('sbFetch error:', e.message);
+    throw e;
+  }
+}
+
+// Cache local
+let DB = { membres: [], users: [], cotisHebdo: [], cotisSpec: [], depenses: [] };
+let currentUser = null;
+
+async function loadAllData() {
+  showToast('⏳ Chargement des données...');
+  try {
+    const [membres, users, cotisHebdo, cotisSpec, depenses] = await Promise.all([
+      sbFetch('membres', 'GET', null, '?order=nom'),
+      sbFetch('users', 'GET', null, '?order=nom'),
+      sbFetch('cotis_hebdo', 'GET', null, '?order=ts.desc.nullslast'),
+      sbFetch('cotis_spec', 'GET', null, '?order=ts.desc.nullslast'),
+      sbFetch('depenses', 'GET', null, '?order=ts.desc.nullslast'),
+    ]);
+    DB.membres    = Array.isArray(membres)    ? membres    : [];
+    DB.users      = Array.isArray(users)      ? users      : [];
+    DB.cotisHebdo = Array.isArray(cotisHebdo) ? cotisHebdo : [];
+    DB.cotisSpec  = Array.isArray(cotisSpec)  ? cotisSpec  : [];
+    DB.depenses   = Array.isArray(depenses)   ? depenses   : [];
+    refreshAll();
+    showToast('✅ Données synchronisées !');
+  } catch(e) {
+    showToast('❌ Erreur de connexion');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('login-pass').value.trim();
+  const alertEl = document.getElementById('login-alert');
+  alertEl.style.display = 'none';
+
+  if (!email || !pass) {
+    alertEl.textContent = '⚠️ Remplis tous les champs.';
+    alertEl.style.display = 'flex';
+    return;
+  }
+
+  showToast('⏳ Connexion...');
+
+  try {
+    const url = SUPABASE_URL + '/rest/v1/users?email=eq.' + encodeURIComponent(email) + '&pass=eq.' + encodeURIComponent(pass) + '&select=*';
+    const res = await fetch(url, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY
+      }
+    });
+    const users = await res.json();
+    const user = Array.isArray(users) && users.length > 0 ? users[0] : null;
+
+    if (!user) {
+      alertEl.textContent = '❌ Email ou mot de passe incorrect.';
+      alertEl.style.display = 'flex';
+      return;
+    }
+
+    currentUser = user;
+    document.getElementById('screen-login').style.display = 'none';
+    document.getElementById('app-shell').style.display = 'block';
+    document.getElementById('user-badge').textContent = user.role === 'admin' ? '⚙ ADMIN' : '👤 MEMBRE';
+    document.getElementById('fab-btn').style.display = user.role === 'admin' ? 'flex' : 'none';
+    document.getElementById('dash-date').textContent = new Date().toLocaleDateString('fr-FR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    await loadAllData();
+  } catch(e) {
+    alertEl.textContent = '❌ Erreur : ' + (e.message || 'Vérifie ta connexion internet.');
+    alertEl.style.display = 'flex';
+  }
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('app-shell').style.display = 'none';
+  document.getElementById('screen-login').style.display = 'flex';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+let currentScreen = 'dash';
+function goScreen(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentScreen = name;
+  refreshAll();
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════════════
+function openModal(id) {
+  // Pre-fill dates
+  const today = new Date().toISOString().split('T')[0];
+  const dateFields = { 'modal-hebdo': 'hebdo-date', 'modal-spec': 'spec-date', 'modal-dep': 'dep-date' };
+  if (dateFields[id]) document.getElementById(dateFields[id]).value = today;
+
+  // Populate member selects
+  if (id === 'modal-hebdo' || id === 'modal-spec') {
+    const selId = id === 'modal-hebdo' ? 'hebdo-membre' : 'spec-membre';
+    const sel = document.getElementById(selId);
+    sel.innerHTML = DB.membres.filter(m => m.actif).map(m =>
+      `<option value="${m.id}">${m.prenom} ${m.nom}</option>`).join('');
+  }
+
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+function openFab() {
+  if (currentUser?.role !== 'admin') { showToast('❌ Accès réservé aux administrateurs'); return; }
+  openModal('modal-fab');
+}
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// SAVE FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+async function saveHebdo() {
+  const membreId  = document.getElementById('hebdo-membre').value;
+  const date      = document.getElementById('hebdo-date').value;
+  const montant   = parseFloat(document.getElementById('hebdo-montant').value) || 0;
+  const collecteur = document.getElementById('hebdo-collecteur').value.trim();
+  if (!membreId || !date || montant <= 0) { showToast('⚠️ Remplis tous les champs'); return; }
+  const membre = DB.membres.find(m => m.id === membreId);
+  await sbFetch('cotis_hebdo', 'POST', { id: uid(), membreid: membreId, nom: membre.prenom + ' ' + membre.nom, dateseance: date, montant, collecteur, ts: Date.now() });
+  closeModal('modal-hebdo'); await loadAllData();
+  showToast('✅ Cotisation enregistrée !');
+  document.getElementById('hebdo-montant').value = '';
+  document.getElementById('hebdo-collecteur').value = '';
+}
+
+async function saveSpec() {
+  const objet    = document.getElementById('spec-objet').value.trim();
+  const membreId = document.getElementById('spec-membre').value;
+  const date     = document.getElementById('spec-date').value;
+  const montant  = parseFloat(document.getElementById('spec-montant').value) || 0;
+  const objectif = parseFloat(document.getElementById('spec-objectif').value) || 0;
+  if (!objet || !membreId || !date || montant <= 0) { showToast('⚠️ Remplis tous les champs'); return; }
+  const membre = DB.membres.find(m => m.id === membreId);
+  await sbFetch('cotis_spec', 'POST', { id: uid(), objet, membreid: membreId, nom: membre.prenom + ' ' + membre.nom, dateseance: date, montant, objectif, ts: Date.now() });
+  closeModal('modal-spec'); await loadAllData();
+  showToast('✅ Cotisation spéciale enregistrée !');
+  document.getElementById('spec-objet').value = '';
+  document.getElementById('spec-montant').value = '';
+  document.getElementById('spec-objectif').value = '';
+}
+
+async function saveDep() {
+  const desc    = document.getElementById('dep-desc').value.trim();
+  const cat     = document.getElementById('dep-cat').value;
+  const date    = document.getElementById('dep-date').value;
+  const montant = parseFloat(document.getElementById('dep-montant').value) || 0;
+  const payeur  = document.getElementById('dep-payeur').value.trim();
+  if (!desc || !date || montant <= 0) { showToast('⚠️ Remplis tous les champs'); return; }
+  await sbFetch('depenses', 'POST', { id: uid(), description: desc, cat, dateop: date, montant, payeur, ts: Date.now() });
+  closeModal('modal-dep'); await loadAllData();
+  showToast('✅ Dépense enregistrée !');
+  document.getElementById('dep-desc').value = '';
+  document.getElementById('dep-montant').value = '';
+  document.getElementById('dep-payeur').value = '';
+}
+
+async function saveMembre() {
+  const nom    = document.getElementById('mbr-nom').value.trim().toUpperCase();
+  const prenom = document.getElementById('mbr-prenom').value.trim();
+  const poste  = document.getElementById('mbr-poste').value;
+  const role   = document.getElementById('mbr-role').value;
+  if (!nom || !prenom) { showToast('⚠️ Nom et prénom requis'); return; }
+  await sbFetch('membres', 'POST', { id: uid(), nom, prenom, poste, role, actif: true });
+  closeModal('modal-membre'); await loadAllData();
+  showToast('✅ Membre ajouté !');
+  document.getElementById('mbr-nom').value = '';
+  document.getElementById('mbr-prenom').value = '';
+}
+
+// ═══════════════════════════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════════════════════════
+async function deleteItem(type, id) {
+  if (currentUser?.role !== 'admin') { showToast('❌ Accès refusé'); return; }
+  if (!confirm('Supprimer cet enregistrement ?')) return;
+  const tableMap = { hebdo: 'cotis_hebdo', spec: 'cotis_spec', dep: 'depenses', mbr: 'membres' };
+  await sbFetch(tableMap[type], 'DELETE', null, '?id=eq.' + id);
+  await loadAllData();
+  showToast('🗑 Supprimé');
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════
+const fmtNum = n => new Intl.NumberFormat('fr-FR').format(Math.round(n));
+const fmtDate = d => d ? new Date(d).toLocaleDateString('fr-FR') : '—';
+const catEmoji = { 'Terrain / Location':'🏟','Ballons':'⚽','Dossards':'👕','Arbitrage':'🟡','Transport':'🚌','Restauration':'🍽','Médical':'🏥','Autre':'📦' };
+
+function refreshAll() {
+  const totalHebdo = DB.cotisHebdo.reduce((s,x) => s + x.montant, 0);
+  const totalSpec  = DB.cotisSpec.reduce((s,x) => s + x.montant, 0);
+  const totalDep   = DB.depenses.reduce((s,x) => s + x.montant, 0);
+  const solde      = totalHebdo + totalSpec - totalDep;
+  const isAdmin    = currentUser?.role === 'admin';
+
+  // DASHBOARD
+  document.getElementById('stat-hebdo').textContent = fmtNum(totalHebdo);
+  document.getElementById('stat-spec').textContent  = fmtNum(totalSpec);
+  document.getElementById('stat-dep').textContent   = fmtNum(totalDep);
+  document.getElementById('stat-solde').textContent = fmtNum(solde);
+  document.getElementById('stat-membres').textContent = DB.membres.filter(m=>m.actif).length;
+
+  const soldeCard = document.getElementById('stat-solde-card');
+  soldeCard.className = 'stat-card ' + (solde < 0 ? 'red' : '');
+  if (solde >= 0) {
+    soldeCard.style.background = 'var(--green-pale)';
+    soldeCard.style.border = '1.5px solid var(--green-light)';
+    document.getElementById('stat-solde').style.color = 'var(--green-mid)';
+    soldeCard.querySelector('.stat-label').style.color = 'var(--gray-400)';
+  } else {
+    soldeCard.style.background = 'var(--red-light)';
+    soldeCard.style.border = '1.5px solid #f5c6c2';
+    document.getElementById('stat-solde').style.color = 'var(--red)';
+  }
+
+  const dashAlert = document.getElementById('dash-alert');
+  if (solde < 0) {
+    dashAlert.className = 'alert alert-error';
+    dashAlert.innerHTML = '⚠️ Attention : La caisse est déficitaire !';
+    dashAlert.style.display = 'flex';
+  } else {
+    dashAlert.style.display = 'none';
+  }
+
+  // Recent ops
+  const allOps = [
+    ...DB.cotisHebdo.map(x => ({...x, type:'hebdo'})),
+    ...DB.cotisSpec.map(x => ({...x, type:'spec'})),
+    ...DB.depenses.map(x => ({...x, type:'dep'})),
+  ].sort((a,b) => b.ts - a.ts).slice(0,5);
+
+  const recentDiv = document.getElementById('dash-recent');
+  if (allOps.length === 0) {
+    recentDiv.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Aucune opération enregistrée</p></div>';
+  } else {
+    recentDiv.innerHTML = allOps.map(op => {
+      const isOut = op.type === 'dep';
+      const icon  = op.type === 'hebdo' ? '💰' : op.type === 'spec' ? '🎯' : '📤';
+      const label = op.type === 'hebdo' ? op.nom : op.type === 'spec' ? op.objet : op.description;
+      return `<div class="list-item">
+        <div class="list-item-left">
+          <div class="list-avatar">${icon}</div>
+          <div>
+            <div class="list-name">${label}</div>
+            <div class="list-meta">${fmtDate(op.dateseance || op.dateop)}</div>
+          </div>
+        </div>
+        <div class="list-amount ${isOut ? 'amount-red' : 'amount-green'}">${isOut ? '-' : '+'}${fmtNum(op.montant)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // COTISATIONS HEBDO
+  const hebdoList = document.getElementById('cotis-hebdo-list');
+  document.getElementById('cotis-hebdo-total').textContent = fmtNum(totalHebdo) + ' FCFA';
+  if (DB.cotisHebdo.length === 0) {
+    hebdoList.innerHTML = '<div class="empty-state"><div class="empty-icon">💰</div><p>Aucune cotisation hebdomadaire</p></div>';
+  } else {
+    const sorted = [...DB.cotisHebdo].sort((a,b) => b.ts - a.ts);
+    hebdoList.innerHTML = sorted.map(x => `
+      <div class="list-item">
+        <div class="list-item-left">
+          <div class="list-avatar">${x.nom[0]}</div>
+          <div>
+            <div class="list-name">${x.nom}</div>
+            <div class="list-meta">${fmtDate(x.dateseance)}${x.collecteur ? ' · ' + x.collecteur : ''}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="list-amount amount-green">${fmtNum(x.montant)}</div>
+          ${isAdmin ? `<button class="delete-btn" onclick="deleteItem('hebdo','${x.id}')">🗑</button>` : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  // COTISATIONS SPÉCIALES
+  const specList = document.getElementById('cotis-spec-list');
+  document.getElementById('cotis-spec-total').textContent = fmtNum(totalSpec) + ' FCFA';
+  const maxObjectif = DB.cotisSpec.reduce((m,x) => Math.max(m, x.objectif||0), 0);
+  const progWrap = document.getElementById('spec-progress-wrap');
+  if (maxObjectif > 0) {
+    progWrap.style.display = 'block';
+    const pct = Math.min(100, Math.round(totalSpec / maxObjectif * 100));
+    document.getElementById('spec-prog-pct').textContent = pct + '%';
+    document.getElementById('spec-prog-bar').style.width = pct + '%';
+    document.getElementById('spec-objectif-lbl').textContent = fmtNum(maxObjectif);
+  } else {
+    progWrap.style.display = 'none';
+  }
+  if (DB.cotisSpec.length === 0) {
+    specList.innerHTML = '<div class="empty-state"><div class="empty-icon">🎯</div><p>Aucune cotisation spéciale</p></div>';
+  } else {
+    const sorted = [...DB.cotisSpec].sort((a,b) => b.ts - a.ts);
+    specList.innerHTML = sorted.map(x => `
+      <div class="list-item">
+        <div class="list-item-left">
+          <div class="list-avatar">${x.nom[0]}</div>
+          <div>
+            <div class="list-name">${x.nom}</div>
+            <div class="list-meta">${x.objet} · ${fmtDate(x.dateseance)}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="list-amount amount-gold">${fmtNum(x.montant)}</div>
+          ${isAdmin ? `<button class="delete-btn" onclick="deleteItem('spec','${x.id}')">🗑</button>` : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  // DÉPENSES
+  const depList = document.getElementById('dep-list');
+  document.getElementById('dep-total').textContent = fmtNum(totalDep) + ' FCFA';
+  if (DB.depenses.length === 0) {
+    depList.innerHTML = '<div class="empty-state"><div class="empty-icon">📤</div><p>Aucune dépense enregistrée</p></div>';
+  } else {
+    const sorted = [...DB.depenses].sort((a,b) => b.ts - a.ts);
+    depList.innerHTML = sorted.map(x => `
+      <div class="list-item">
+        <div class="list-item-left">
+          <div class="list-avatar">${catEmoji[x.cat] || '📦'}</div>
+          <div>
+            <div class="list-name">${x.description}</div>
+            <div class="list-meta"><span class="badge badge-gray">${x.cat}</span> · ${fmtDate(x.dateop)}${x.payeur ? ' · ' + x.payeur : ''}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="list-amount amount-red">-${fmtNum(x.montant)}</div>
+          ${isAdmin ? `<button class="delete-btn" onclick="deleteItem('dep','${x.id}')">🗑</button>` : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  // MEMBRES
+  renderMembres();
+}
+
+function renderMembres() {
+  const isAdmin = currentUser?.role === 'admin';
+  const q = (document.getElementById('membre-search')?.value || '').toLowerCase();
+  const list = document.getElementById('membres-list');
+  let membres = DB.membres.filter(m => {
+    const full = `${m.prenom} ${m.nom}`.toLowerCase();
+    return full.includes(q);
+  });
+
+  if (membres.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>Aucun membre trouvé</p></div>';
+    return;
+  }
+
+  list.innerHTML = membres.map(m => `
+    <div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="list-avatar" style="width:44px;height:44px;font-size:18px;">${m.prenom[0]}${m.nom[0]}</div>
+          <div>
+            <div style="font-weight:700;font-size:15px;">${m.prenom} <span style="text-transform:uppercase">${m.nom}</span></div>
+            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
+              <span class="badge badge-green">${m.poste}</span>
+              <span class="badge ${m.role === 'admin' ? 'badge-admin' : 'badge-gray'}">${m.role === 'admin' ? '⚙ Admin' : '👤 Membre'}</span>
+            </div>
+          </div>
+        </div>
+        ${isAdmin ? `<button class="delete-btn" onclick="deleteItem('mbr','${m.id}')">🗑</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// COTIS TABS
+// ═══════════════════════════════════════════════════════════
+function switchCotisTab(tab, btn) {
+  document.querySelectorAll('.seg-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cotis-hebdo-view').style.display = tab === 'hebdo' ? 'block' : 'none';
+  document.getElementById('cotis-spec-view').style.display  = tab === 'spec'  ? 'block' : 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.
